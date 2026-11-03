@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title | default: site.title }}</title>
+    <script src="{{ '/assets/jquery.min.js' | relative_url }}"></script>
+    <script src="{{ '/assets/bootstrap.min.js' | relative_url }}"></script>
+    <link rel="stylesheet" href="{{ '/assets/bootstrap.min.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <link type="application/atom+xml" rel="alternate" href="{{ site.url | append: '/' | append: site.feed.path }}" title="{{ site.title }}" />
+    <link rel="icon" href="{{ '/favicon.png' | relative_url }}" type="image/png">
+  </head>
+  <body>
+    <main class="main"> 
+      <nav>
+        <b>
+        <a href="/">Home</a> | <a href="/log">Log</a> | <a href="/about">About</a> | <a href="/contact">Contact</a>
+        </b>
+      </nav>
+      {{ content }}
+      <footer>
+        &copy 2026 Themadpunter
+      </footer>
+    </main>
+  </body>
+</html>

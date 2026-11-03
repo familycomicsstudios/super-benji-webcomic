@@ -1,0 +1,9 @@
+---
+layout: page
+title: Super Benji Webcomic - Log
+permalink: /log
+---
+{% assign sorted_posts = site.comics | sort: "number" | reverse %}
+{% for post in sorted_posts %}
+    <p><a href="{{ post.url }}">{{ post.title }}</a> - {{ post.date | date: "%B %d, %Y" }}</p>
+{% endfor %}
