@@ -1,8 +1,8 @@
 title: "Super Benji Webcomic"
 description: "The official webcomic adaptation of the Super Benji series."
-url: ""
+url: "comic.superbenji.us"
 author: "Themadpunter"
-baseurl: "super-benji-webcomic/"
+baseurl: "/"
 permalink: /:title/
 
 collections:
