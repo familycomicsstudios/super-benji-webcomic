@@ -48,6 +48,38 @@ p {
     font-size: 20px;
 }
 
+.comic-navigation {
+    flex-direction: column;
+}
+
+.comic-save-controls {
+    flex-direction: column;
+}
+
+.comic-save-links {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.comic-save-controls a[aria-disabled="true"] {
+    color: #666;
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+.comic-save-controls p {
+    flex-basis: 100%;
+    margin: 0;
+    text-align: center;
+}
+
+.comic-save-controls #save-status {
+    font-size: 12px;
+}
+
 nav {
     display: flex;
     justify-content: center;

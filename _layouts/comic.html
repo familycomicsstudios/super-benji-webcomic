@@ -18,23 +18,202 @@ layout: default
         <a id="last-page" href="{{ site.data.comic.final_page | prepend: '/' | relative_url }}">Last »</a>
     {% endif %}
     </p>
+    <div class="comic-save-controls"
+         data-comic-root="{{ '/' | relative_url }}"
+         data-final-page="{{ site.data.comic.final_page }}"
+         data-current-page="{{ page.number | default: '' }}">
+        <div class="comic-save-links">
+        {% if page.number %}
+        <a id="save-page" href="#" role="button">Save</a><span aria-hidden="true">&nbsp;|&nbsp;</span>
+        {% endif %}
+        <a id="autosave-pages" href="#" role="button" aria-pressed="false">Autosave (<span id="autosave-state">x</span>)</a><span aria-hidden="true">&nbsp;|&nbsp;</span>
+        <a id="load-page" href="#" role="button" aria-disabled="true">Load (<span id="saved-page-number">—</span>)</a>
+        </div>
+        <p id="save-status" class="save-status-text" role="status" aria-live="polite"></p>
+    </div>
 </div>
 </div>
 
 <script>
-document.addEventListener("keydown", function(event) {
-    if (event.key === "ArrowLeft") {
-        const previous = document.getElementById("previous-page");
-        if (previous) {
-            window.location.href = previous.href;
+(() => {
+    const controls = document.querySelector(".comic-save-controls");
+    const saveButton = document.getElementById("save-page");
+    const autosaveToggle = document.getElementById("autosave-pages");
+    const autosaveState = document.getElementById("autosave-state");
+    const loadButton = document.getElementById("load-page");
+    const savedPageNumber = document.getElementById("saved-page-number");
+    const status = document.getElementById("save-status");
+    const savedPageKey = "super-benji-saved-page";
+    const autosaveKey = "super-benji-autosave";
+    const sequentialPageKey = "super-benji-sequential-page-number";
+    const currentPage = Number(controls.dataset.currentPage);
+    const finalPage = Number(controls.dataset.finalPage);
+    const comicRoot = controls.dataset.comicRoot.endsWith("/")
+        ? controls.dataset.comicRoot
+        : `${controls.dataset.comicRoot}/`;
+    let autosaveEnabled = false;
+
+    function setStatus(message) {
+        status.textContent = message;
+    }
+
+    function readSavedPage() {
+        let savedPage;
+        try {
+            savedPage = window.localStorage.getItem(savedPageKey);
+        } catch {
+            setStatus("Your browser could not access saved pages.");
+            return null;
+        }
+
+        if (savedPage === null) {
+            return null;
+        }
+
+        const pageNumber = Number(savedPage);
+        if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > finalPage) {
+            setStatus("The saved page number is invalid. Save a page to replace it.");
+            return null;
+        }
+
+        return pageNumber;
+    }
+
+    function updateLoadLink() {
+        const savedPage = readSavedPage();
+        savedPageNumber.textContent = savedPage === null ? "—" : String(savedPage);
+        loadButton.setAttribute("aria-disabled", String(savedPage === null));
+    }
+
+    function updateAutosaveLink() {
+        autosaveState.textContent = autosaveEnabled ? "✓" : "x";
+        autosaveToggle.setAttribute("aria-pressed", String(autosaveEnabled));
+    }
+
+    function disableAutosave() {
+        autosaveEnabled = false;
+        updateAutosaveLink();
+        setStatus("Autosave turned off. Use Previous or Next to continue autosaving.");
+        try {
+            window.sessionStorage.removeItem(autosaveKey);
+        } catch {
+            setStatus("Your browser could not update the autosave setting.");
         }
     }
 
-    if (event.key === "ArrowRight") {
-        const next = document.getElementById("next-page");
-        if (next) {
-            window.location.href = next.href;
+    function markSequentialNavigation(link) {
+        const match = new URL(link.href).pathname.match(/\/(\d+)\/?$/);
+        if (!match) {
+            return;
+        }
+
+        try {
+            window.sessionStorage.setItem(sequentialPageKey, match[1]);
+        } catch {
+            setStatus("Your browser could not track page navigation for autosave.");
         }
     }
-});
+
+    function saveCurrentPage() {
+        if (!Number.isInteger(currentPage) || currentPage < 1 || currentPage > finalPage) {
+            return;
+        }
+
+        try {
+            window.localStorage.setItem(savedPageKey, String(currentPage));
+            updateLoadLink();
+        } catch {
+            setStatus("Your browser could not save this page.");
+        }
+    }
+
+    try {
+        autosaveEnabled = window.sessionStorage.getItem(autosaveKey) === "true";
+    } catch {
+        setStatus("Your browser could not remember the autosave setting for this visit.");
+    }
+
+    updateAutosaveLink();
+    updateLoadLink();
+
+    if (autosaveEnabled) {
+        let expectedPage;
+        try {
+            expectedPage = window.sessionStorage.getItem(sequentialPageKey);
+            window.sessionStorage.removeItem(sequentialPageKey);
+        } catch {
+            setStatus("Your browser could not verify page navigation for autosave.");
+        }
+
+        if (expectedPage === String(currentPage)) {
+            saveCurrentPage();
+        } else {
+            disableAutosave();
+        }
+    } else {
+        try {
+            window.sessionStorage.removeItem(sequentialPageKey);
+        } catch {
+            setStatus("Your browser could not track page navigation for autosave.");
+        }
+    }
+
+    ["previous-page", "next-page"].forEach(id => {
+        const link = document.getElementById(id);
+        if (link) {
+            link.addEventListener("click", event => {
+                if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+                    markSequentialNavigation(link);
+                }
+            });
+        }
+    });
+
+    if (saveButton) {
+        saveButton.addEventListener("click", event => {
+            event.preventDefault();
+            saveCurrentPage();
+        });
+    }
+
+    autosaveToggle.addEventListener("click", event => {
+        event.preventDefault();
+        autosaveEnabled = !autosaveEnabled;
+        updateAutosaveLink();
+
+        try {
+            if (autosaveEnabled) {
+                window.sessionStorage.setItem(autosaveKey, "true");
+            } else {
+                window.sessionStorage.removeItem(autosaveKey);
+            }
+        } catch {
+            setStatus("Your browser could not remember the autosave setting for this visit.");
+        }
+    });
+
+    loadButton.addEventListener("click", event => {
+        event.preventDefault();
+        const savedPage = readSavedPage();
+        if (savedPage !== null) {
+            window.location.href = `${comicRoot}${savedPage}/`;
+        } else {
+            updateLoadLink();
+        }
+    });
+
+    document.addEventListener("keydown", event => {
+        const link = event.key === "ArrowLeft"
+            ? document.getElementById("previous-page")
+            : event.key === "ArrowRight"
+                ? document.getElementById("next-page")
+                : null;
+
+        if (link) {
+            event.preventDefault();
+            markSequentialNavigation(link);
+            window.location.href = link.href;
+        }
+    });
+})();
 </script>
