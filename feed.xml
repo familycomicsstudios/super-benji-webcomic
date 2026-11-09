@@ -48,8 +48,10 @@ permalink: /feed.xml
         <content type="html">
             <![CDATA[
             {% if comic.image %}
+              <p>
             <img src="{{ comic.image | absolute_url }}"
                  alt="{{ comic.title | xml_escape }}">
+              </p>
             {% endif %}
 
             {{ comic.content }}
