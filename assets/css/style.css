@@ -89,3 +89,8 @@ nav {
 .art-samples {
     display: flex;;
 }
+
+.secret-link {
+    color: rgb(45, 45, 45);
+    text-decoration: none;
+}
