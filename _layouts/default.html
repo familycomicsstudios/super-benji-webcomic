@@ -12,7 +12,7 @@
     <link rel="icon" href="{{ '/favicon.png' | relative_url }}" type="image/png">
   </head>
   <body>
-    <main class="main"> 
+    <main class="main{% if page.layout == 'comic' %} comic-page{% endif %}">
       <nav>
         <p>
         <b>

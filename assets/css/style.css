@@ -29,9 +29,15 @@ img {
 .comic-main {
     background-color: #dddddd;
     padding: 20px;
+    margin-left: -5.5556%;
+    margin-right: -5.5556%;
+}
 
-    max-width: 840px;
-    margin: 0 auto;
+.comic-main > img {
+    display: block;
+    width: calc(100% + 40px);
+    max-width: none;
+    margin: -20px -20px 10px;
 }
 
 .comic-main div {
