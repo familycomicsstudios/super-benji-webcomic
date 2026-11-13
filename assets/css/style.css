@@ -1,7 +1,13 @@
+---
+---
+
 body {
-    background: #ff0000;
-    background: linear-gradient(0deg, rgba(0,0,255,1) 0%, rgba(255,0,0,1) 100%);
+    background-color: #ff0000;
+    background-image: url('{{ site.data.comic.background_image }}');
+    background-position: center center;
+    background-repeat: no-repeat;
     background-attachment: fixed;
+    background-size: cover;
     margin: 0;
 }
 
@@ -99,4 +105,9 @@ nav {
 .secret-link {
     color: rgb(45, 45, 45);
     text-decoration: none;
+}
+
+.map-image {
+    width: 320px;
+    height: auto;
 }
