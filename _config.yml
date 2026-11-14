@@ -4,6 +4,7 @@ url: "https://comic.superbenji.us"
 author: "Themadpunter"
 baseurl: "/"
 permalink: /:title/
+theme: null
 
 collections:
   comics:
