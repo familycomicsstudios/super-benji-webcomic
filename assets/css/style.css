@@ -1,9 +1,6 @@
----
----
-
 body {
     background-color: #ff0000;
-    background-image: url('{{ site.data.comic.background_image }}');
+    background-image: url('/assets/backgrounds/Act 1.png');
     background-position: center center;
     background-repeat: no-repeat;
     background-attachment: fixed;
